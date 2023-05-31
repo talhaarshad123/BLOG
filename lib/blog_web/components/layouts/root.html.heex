@@ -20,6 +20,7 @@
         <ul id="nav-mobile" class="right hide-on-med-and-down">
         <%= if @conn.assigns[:user] do %>
             <li><p><%= @conn.assigns.user.fname %> <%= @conn.assigns.user.lname %></p></li>
+            <li><a href="/myposts">My Posts</a></li>
             <li><a href="/signout">signout</a></li>
         <% else %>
             <li><a href="/signup">Signup</a></li>

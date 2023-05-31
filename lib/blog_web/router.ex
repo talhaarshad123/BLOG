@@ -24,6 +24,7 @@ defmodule BlogWeb.Router do
       live "/blog/:blog_id/comment", AddCommentLive
       live "/edit/:id/comment", EditCommentLive
       live "/delete/:id/comment", DeleteCommentLive
+      live "/myposts", MyPostLive
       # live "like/:id", AddLikeLive
 
       #Auth

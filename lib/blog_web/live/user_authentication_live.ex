@@ -12,13 +12,13 @@ defmodule BlogWeb.UserAuthenticationLive do
       margin-right:25%; width: 50%; margin-top: 8%">
         <div class="row">
           <div class="input-field col s6">
-            <input type="email" placeholder="Enter Email" name="user_details[email]" value= "<%= @user_details["email"]%>" >
+            <input type="email" placeholder="Enter Email" name="user_details[email]" value= "<%= @user_details["email"]%>" required>
             <%= if @emailRequired do %>
-              <span>!enter valid email</span>
+              <span>enter valid email</span>
             <% end %>
           </div>
           <div class="input-field col s6">
-            <input type="password"  placeholder="Enter Password" name="user_details[password]" value= "<%= @user_details["password"]%>" >
+            <input type="password"  placeholder="Enter Password" name="user_details[password]" value= "<%= @user_details["password"]%>" required>
             <%= if @passRequired do %>
               <span>Field is required</span>
             <% end %>

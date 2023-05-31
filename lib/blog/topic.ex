@@ -6,9 +6,13 @@ defmodule Blog.Topic do
   import Ecto.Query
   alias Blog.Model.Like
 
-  def all_topics() do
+  def all_topics(page) do
+    limit = 3
     query = from t in Topic,
-    order_by: t.id
+    limit: ^limit,
+    offset: (^page - 1) * ^limit,
+    order_by: [desc: t.inserted_at]
+
     Repo.all(query)
   end
   def create_blog(blog, user_id) do
@@ -59,6 +63,17 @@ defmodule Blog.Topic do
     group_by: [t.id, l.topic_id],
     select: t.id,
     where: l.user_id == ^user_id
+
+    Repo.all(query)
+  end
+
+  def get_user_posts(page, user_id) do
+    limit = 3
+    query = from t in Topic,
+    limit: ^limit,
+    offset: (^page - 1) * ^limit,
+    order_by: [desc: t.inserted_at],
+    where: t.user_id == ^user_id
 
     Repo.all(query)
   end

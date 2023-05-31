@@ -11,7 +11,6 @@ defmodule BlogWeb.ListAllBlogsLive do
       <h5>Topics</h5>
       <ul class="collection">
       <%= for topic <- @topics do %>
-
         <li class="collection-item">
           <a href="/blog/<%= topic.id %>/comment"><%= topic.title %></a>
           <%= if @authenticated and @user_id == topic.user_id do  %>
@@ -32,6 +31,17 @@ defmodule BlogWeb.ListAllBlogsLive do
         </li>
       <% end %>
       </ul>
+      <div>
+      <%= if @page > 1 do %>
+        <a class="waves-effect waves-light btn" phx-click="previous">back</a>
+      <% end %>
+        <%= case @topics do %>
+        <% [] -> %>
+          <a class="waves-effect waves-light btn disabled">next</a>
+        <% _ ->  %>
+          <a class="waves-effect waves-light btn" phx-click="next">next</a>
+        <% end %>
+      </div>
       <div class="fixed-action-btn">
       <a href="/new">
       <i class="material-icons">add</i>
@@ -40,20 +50,22 @@ defmodule BlogWeb.ListAllBlogsLive do
     """
   end
 
+
+
   def mount(_, %{"auth_token" => auth_token}, socket) do
-    topics = Topic.all_topics()
+    topics = Topic.all_topics(1)
     case Token.verify(BlogWeb.Endpoint, "somekey", auth_token) do
       {:ok, user_id} ->
         PubSub.subscribe(Blog.PubSub, "likes")
-        {:ok, socket |> assign(topics: topics, user_id: user_id, authenticated: true)}
+        {:ok, socket |> assign(topics: topics, user_id: user_id, authenticated: true, page: 1)}
       {:error, _} -> {:ok, socket |> put_flash(:error, "Authentication Error.") |> redirect(to: "/")}
     end
   end
 
   def mount(_, _, socket) do
-    topics = Topic.all_topics()
+    topics = Topic.all_topics(1)
     # PubSub.subscribe(Blog.PubSub, "likes")
-    {:ok, socket |> assign(topics: topics, user_id: nil, authenticated: false)}
+    {:ok, socket |> assign(topics: topics, user_id: nil, authenticated: false, page: 1)}
   end
 
   def handle_event("manage-like", %{"id" => blog_id}, socket) do
@@ -86,8 +98,21 @@ defmodule BlogWeb.ListAllBlogsLive do
     end
   end
 
+  def handle_event("previous", _unsigned_params, socket) do
+    current_page = socket.assigns.page
+    current_page = current_page - 1
+    topics = Topic.all_topics(current_page)
+    {:noreply, socket |> assign(topics: topics, page: current_page)}
+  end
+  def handle_event("next", _unsigned_params, socket) do
+    current_page = socket.assigns.page
+    current_page = current_page + 1
+    topics = Topic.all_topics(current_page)
+    {:noreply, socket |> assign(topics: topics, page: current_page)}
+  end
+
   def handle_info(_msg, socket) do
-    topics = Topic.all_topics()
+    topics = Topic.all_topics(1)
     {:noreply, socket |> assign(topics: topics)}
   end
 
