@@ -30,12 +30,9 @@ defmodule BlogWeb.Router do
     pipe_through :browser
       live "/", ListAllBlogsLive
       live "/blog/:blog_id/comment", AddCommentLive
-
-      live "/test", TestLive
       live "/signup", UserRegistrationLive
       live "/login", UserAuthenticationLive
       get "/login/:token", ConfigUserSessionController, :login_user
-      post "/my", ConfigUserSessionController, :dis_form
 
     end
 
