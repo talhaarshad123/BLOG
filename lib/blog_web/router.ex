@@ -55,10 +55,10 @@ defmodule BlogWeb.Router do
     # get "/", PageController, :home
 
   # Other scopes may use custom stacks.
-  scope "/api", BlogWeb do
-    pipe_through :api
-    post "/my", ConfigUserSessionController, :dis_form
-  end
+  # scope "/api", BlogWeb do
+  #   pipe_through :api
+
+  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:blog, :dev_routes) do

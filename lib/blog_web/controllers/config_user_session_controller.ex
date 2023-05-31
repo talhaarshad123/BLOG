@@ -18,12 +18,6 @@ defmodule BlogWeb.ConfigUserSessionController do
     |> redirect(to: "/")
   end
 
-  def dis_form(conn, params) do
-    IO.inspect("=================")
-    IO.inspect(conn)
-    IO.inspect("=======================")
-    IO.inspect(params)
-  end
 
 
 end
