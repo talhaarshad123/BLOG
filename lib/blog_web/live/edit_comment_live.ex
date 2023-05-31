@@ -1,6 +1,6 @@
 defmodule BlogWeb.EditCommentLive do
   use Phoenix.LiveView
-  alias Blog.Comment
+  alias Blog.Comments
   alias Phoenix.Token
 
 
@@ -22,27 +22,20 @@ defmodule BlogWeb.EditCommentLive do
 
   def mount(%{"id" => comment_id}, %{"auth_token" => auth_token}, socket) do
     comment_id = String.to_integer(comment_id)
-    comment = Comment.get_comment_by_id(comment_id)
-    case Token.verify(BlogWeb.Endpoint, "somekey", auth_token) do
-      {:ok, user_id} ->
-        if is_owner?(comment, user_id) do
-          {:ok, socket |> assign(comment: comment)}
-        else
-          {:ok, socket |> put_flash(:error, "Unauthroized") |> redirect(to: "/")}
-        end
-      {:error, _} -> {:ok, socket |> put_flash(:error, "Something went wrong") |> redirect(to: "/edit/#{comment_id}/comment")}
+    comment = Comments.get_comment_by_id(comment_id)
+    {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
+    if is_owner?(comment, user_id) do
+      {:ok, socket |> assign(comment: comment)}
+    else
+      {:ok, socket |> put_flash(:error, "Unauthroized") |> redirect(to: "/")}
     end
-  end
-
-  def mount(_, _, socket) do
-    {:ok, socket |> put_flash(:error, "Unauthroized") |> redirect(to: "/")}
   end
   def handle_event("save", %{"content" => content}, socket) do
     comment = socket.assigns.comment
     blog_id = socket.assigns.comment.topic_id
-    case Comment.update_comment(comment, content) do
-      {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Updated.") |> redirect(to: "/blog/#{blog_id}/comment")}
-      {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "/edit/#{comment.id}/comment")}
+    case Comments.update_comment(comment, content) do
+      {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Updated.") |> redirect(to: "auth/blog/#{blog_id}/comment")}
+      {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "auth/edit/#{comment.id}/comment")}
 
     end
   end

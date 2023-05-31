@@ -1,11 +1,11 @@
-defmodule Blog.Like do
+defmodule Blog.Likes do
   alias Blog.Repo
-  alias Blog.Topic
+  alias Blog.Topics
   import Ecto
   alias Blog.Model.Like
 
   def insert_like(blog_id, user_id) do
-    Topic.get_blog_by_id(blog_id)
+    Topics.get_blog_by_id(blog_id)
     |> build_assoc(:likes, user_id: user_id)
     |> Like.changeset()
     |> Repo.insert()

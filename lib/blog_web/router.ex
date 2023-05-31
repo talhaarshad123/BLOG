@@ -11,6 +11,17 @@ defmodule BlogWeb.Router do
     plug BlogWeb.Plugs.SetUser
   end
 
+  pipeline :auth do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {BlogWeb.Layouts, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+    plug BlogWeb.Plugs.SetUser
+    plug BlogWeb.Plugs.RequireAuth
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -18,28 +29,36 @@ defmodule BlogWeb.Router do
   scope "/", BlogWeb do
     pipe_through :browser
       live "/", ListAllBlogsLive
+      live "/blog/:blog_id/comment", AddCommentLive
+
+      live "/test", TestLive
+      live "/signup", UserRegistrationLive
+      live "/login", UserAuthenticationLive
+      get "/login/:token", ConfigUserSessionController, :login_user
+      post "/my", ConfigUserSessionController, :dis_form
+
+    end
+
+  scope "/auth", BlogWeb do
+    pipe_through :auth
       live "/new", NewBlogLive
       live "/edit/:edit", EditBlogLive
       live "/delete/:blog_id", DeleteBlogLive
-      live "/blog/:blog_id/comment", AddCommentLive
       live "/edit/:id/comment", EditCommentLive
       live "/delete/:id/comment", DeleteCommentLive
       live "/myposts", MyPostLive
-      # live "like/:id", AddLikeLive
 
-      #Auth
-      live "/signup", UserRegistrationLive
-      live "/login", UserAuthenticationLive
-      get "/login/:token", ConfigUserSession, :login_user
-      get "/signout", ConfigUserSession, :logout_user
-    end
+      get "/signout", ConfigUserSessionController, :logout_user
+
+  end
 
     # get "/", PageController, :home
 
   # Other scopes may use custom stacks.
-  # scope "/api", BlogWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", BlogWeb do
+    pipe_through :api
+    post "/my", ConfigUserSessionController, :dis_form
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:blog, :dev_routes) do

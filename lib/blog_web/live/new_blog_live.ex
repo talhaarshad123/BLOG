@@ -1,7 +1,7 @@
 defmodule BlogWeb.NewBlogLive do
   use Phoenix.LiveView
   alias Phoenix.Token
-  alias Blog.Topic
+  alias Blog.Topics
 
   def render(assigns) do
     ~L"""
@@ -31,23 +31,15 @@ defmodule BlogWeb.NewBlogLive do
   end
 
   def mount(_, %{"auth_token" => auth_token}, socket) do
-    case Token.verify(BlogWeb.Endpoint, "somekey", auth_token) do
-      {:ok, user_id} ->
-        {:ok, socket
-        |> assign(blog_details: %{"title" => "", "description" => ""}, titleRequired: false, descripRequired: false, authenticated: true, user_id: user_id)}
-      {:error, _} -> {:ok, socket
-        |> assign(blog_details: %{"title" => "", "description" => ""}, titleRequired: false, descripRequired: false, authenticated: false, user_id: nil)}
-    end
-  end
-
-  def mount(_params, _session, socket) do
-    {:ok, socket |> assign(blog_details: %{"title" => "", "description" => ""}, titleRequired: false, descripRequired: false, authenticated: false, user_id: nil)}
+    {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
+    {:ok, socket
+      |> assign(blog_details: %{"title" => "", "description" => ""}, titleRequired: false, descripRequired: false, authenticated: true, user_id: user_id)}
   end
   def handle_event("save", %{"blog_details" => blog_details}, socket) do
     is_authenticated? = socket.assigns.authenticated
     user_id = socket.assigns.user_id
     if is_authenticated? do
-      case Topic.create_blog(blog_details, user_id) do
+      case Topics.create_blog(blog_details, user_id) do
         {:ok, _topic} ->
           {:noreply, socket |> put_flash(:info, "Blog created.") |> redirect(to: "/")}
         {:error, _reason} ->

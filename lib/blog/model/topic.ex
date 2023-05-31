@@ -5,7 +5,6 @@ defmodule Blog.Model.Topic do
   schema "topics" do
     field :title, :string
     field :description, :string
-    field :numberOfLikes, :integer, default: 0
     belongs_to :user, Blog.Model.User
     has_many :comments, Blog.Model.Comment
     has_many :likes, Blog.Model.Like

@@ -9,10 +9,12 @@ defmodule BlogWeb.TestLive do
     """
   end
 
-  def mount(_, _session, socket) do
-    # IO.inspect("------------------")
-    # IO.inspect(session)
-    {:ok, assign(socket, counter: 0)}
+  def mount(_, session, socket) do
+    IO.inspect("+++++++++++++++++++")
+    IO.inspect(session)
+    IO.inspect("------------------------")
+    IO.inspect(socket)
+    {:ok, socket |> assign(counter: 0)}
   end
   # def handle_event("update", %{"key" => "ArrowDown"}, socket) do
   #   {:ok, assign(socket, counter: socket.assigns.counter - 1)}

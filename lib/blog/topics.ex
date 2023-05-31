@@ -1,8 +1,8 @@
-defmodule Blog.Topic do
+defmodule Blog.Topics do
   import Ecto
   alias Blog.Repo
   alias Blog.Model.Topic
-  alias Blog.User
+  alias Blog.Users
   import Ecto.Query
   alias Blog.Model.Like
 
@@ -11,12 +11,13 @@ defmodule Blog.Topic do
     query = from t in Topic,
     limit: ^limit,
     offset: (^page - 1) * ^limit,
-    order_by: [desc: t.inserted_at]
+    order_by: [desc: t.inserted_at],
+    preload: [:likes]
 
     Repo.all(query)
   end
   def create_blog(blog, user_id) do
-    User.get_user_by_id(user_id)
+    Users.get_user_by_id(user_id)
     |> build_assoc(:topics)
     |> Topic.changeset(blog)
     |> Repo.insert()
@@ -28,17 +29,6 @@ defmodule Blog.Topic do
 
   def update_blog(currnet_blog ,title, description) do
     Ecto.Changeset.change(currnet_blog, title: title, description: description)
-    |> Repo.update()
-  end
-
-  def update_number_of_likes(%Blog.Model.Topic{numberOfLikes: number_of_likes} = current_blog, :inc) do
-    number_of_likes = number_of_likes + 1
-    Ecto.Changeset.change(current_blog, numberOfLikes: number_of_likes)
-    |> Repo.update()
-  end
-  def update_number_of_likes(%Blog.Model.Topic{numberOfLikes: number_of_likes} = current_blog, :dec) do
-    number_of_likes = number_of_likes - 1
-    Ecto.Changeset.change(current_blog, numberOfLikes: number_of_likes)
     |> Repo.update()
   end
 
@@ -73,6 +63,7 @@ defmodule Blog.Topic do
     limit: ^limit,
     offset: (^page - 1) * ^limit,
     order_by: [desc: t.inserted_at],
+    preload: [:likes],
     where: t.user_id == ^user_id
 
     Repo.all(query)

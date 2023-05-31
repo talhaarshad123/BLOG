@@ -1,6 +1,6 @@
 defmodule BlogWeb.UserAuthenticationLive do
   use Phoenix.LiveView
-  alias Blog.User
+  alias Blog.Users
   import Argon2
   alias Phoenix.Token
 
@@ -51,7 +51,7 @@ defmodule BlogWeb.UserAuthenticationLive do
   end
 
   def handle_event("save", %{"user_details" => %{"password" => password} = user_details }, socket) do
-    case User.get_user_by_email(user_details["email"]) do
+    case Users.get_user_by_email(user_details["email"]) do
       nil ->
         {:noreply, socket |> put_flash(:error, "User does not exist.") |> redirect(to: "/login")}
       user_changeset ->

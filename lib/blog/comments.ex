@@ -1,11 +1,11 @@
-defmodule Blog.Comment do
+defmodule Blog.Comments do
   alias Blog.Repo
-  alias Blog.Topic
+  alias Blog.Topics
   alias Blog.Model.Comment
   import Ecto
 
   def get_comments_by_blog(blog_id) do
-    Topic.get_blog_by_id(blog_id)
+    Topics.get_blog_by_id(blog_id)
     |> Repo.preload(comments: [:user])
   end
 

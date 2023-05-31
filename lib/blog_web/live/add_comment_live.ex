@@ -2,7 +2,7 @@ defmodule BlogWeb.AddCommentLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   # alias Blog.Topic
-  alias Blog.Comment
+  alias Blog.Comments
   alias Phoenix.PubSub
 
   def render(assigns) do
@@ -21,8 +21,8 @@ defmodule BlogWeb.AddCommentLive do
 
       <%= if @is_authenticated? and comment.user_id === @user_id do %>
         <div class="right">
-          <a href="/edit/<%= comment.id %>/comment">Edit</a>
-          <a href="/delete/<%= comment.id %>/comment">delete</a>
+          <a href="/auth/edit/<%= comment.id %>/comment">Edit</a>
+          <a href="/auth/delete/<%= comment.id %>/comment">delete</a>
         </div>
       <% end %>
       <div class="secondary-content">
@@ -38,18 +38,15 @@ defmodule BlogWeb.AddCommentLive do
 
   def mount(%{"blog_id" => blog_id}, %{"auth_token" => auth_token}, socket) do
     blog_id = String.to_integer(blog_id)
-    case Token.verify(BlogWeb.Endpoint, "somekey", auth_token) do
-      {:ok, user_id} ->
-        blog_comments = Comment.get_comments_by_blog(blog_id)
-        PubSub.subscribe(Blog.PubSub, "comment:#{blog_id}")
-        {:ok, socket |> assign(blog: blog_comments, is_authenticated?: true, user_id: user_id)}
-      {:error, _} -> {:ok, socket |> put_flash(:error, "Something went wrong") |> redirect(to: "/")}
-    end
+    {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
+    blog_comments = Comments.get_comments_by_blog(blog_id)
+    PubSub.subscribe(Blog.PubSub, "comment:#{blog_id}")
+    {:ok, socket |> assign(blog: blog_comments, is_authenticated?: true, user_id: user_id)}
   end
 
   def mount(%{"blog_id" => blog_id}, _session, socket) do
     blog_id = String.to_integer(blog_id)
-    blog_comments = Comment.get_comments_by_blog(blog_id)
+    blog_comments = Comments.get_comments_by_blog(blog_id)
     PubSub.subscribe(Blog.PubSub, "comment:#{blog_id}")
     {:ok, socket |> assign(blog: blog_comments, is_authenticated?: false, user_id: nil)}
   end
@@ -63,7 +60,7 @@ defmodule BlogWeb.AddCommentLive do
     blog = socket.assigns.blog
     cond do
       socket.assigns.is_authenticated?->
-        case Comment.insert_comment(blog, params, user_id) do
+        case Comments.insert_comment(blog, params, user_id) do
           {:ok, comment} ->
             broadcast_comment(comment)
             {:noreply, socket}
@@ -76,7 +73,7 @@ defmodule BlogWeb.AddCommentLive do
   end
 
   def handle_info({:comment, comment}, socket) do
-    blog_comments = Comment.get_comments_by_blog(comment.topic_id)
+    blog_comments = Comments.get_comments_by_blog(comment.topic_id)
     {:noreply, assign(socket, blog: blog_comments)}
   end
 

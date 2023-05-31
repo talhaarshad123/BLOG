@@ -1,7 +1,7 @@
 defmodule BlogWeb.EditBlogLive do
   use Phoenix.LiveView
   alias Phoenix.Token
-  alias Blog.Topic
+  alias Blog.Topics
 
 
   def render(assigns) do
@@ -31,32 +31,25 @@ defmodule BlogWeb.EditBlogLive do
 
   def mount(%{"edit" => topic_id}, %{"auth_token" => auth_token}, socket) do
     topic_id = String.to_integer(topic_id)
-    case Token.verify(BlogWeb.Endpoint, "somekey", auth_token) do
-      {:ok, user_id} ->
-        if is_owner?(topic_id, user_id) do
-          topic = Topic.get_blog_by_id(topic_id)
-          {:ok, socket |> assign(topic: topic, titleRequired: false, descripRequired: false)}
-        else
-          {:ok, socket |> put_flash(:error, "Not allowed.") |> redirect(to: "/")}
-        end
-      {:error, _} -> {:ok, socket |> put_flash(:error, "Unauthroized.") |> redirect(to: "/")}
+    {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
+    if is_owner?(topic_id, user_id) do
+      topic = Topics.get_blog_by_id(topic_id)
+      {:ok, socket |> assign(topic: topic, titleRequired: false, descripRequired: false)}
+    else
+      {:ok, socket |> put_flash(:error, "Not allowed.") |> redirect(to: "/")}
     end
-  end
-
-  def mount(_, _, socket) do
-    {:ok, socket |> put_flash(:error, "Unauthroized") |> redirect(to: "/")}
   end
 
   def handle_event("save", %{"description" => description, "title" => title}, socket) do
     topic = socket.assigns.topic
-    case Topic.update_blog(topic, title, description) do
+    case Topics.update_blog(topic, title, description) do
       {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Blog updated") |> redirect(to: "/")}
       {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Oops something went wrong"), redirect(to: "/")}
     end
   end
 
   def is_owner?(topic_id, user_id) do
-    case Topic.get_blog_by_id(topic_id) do
+    case Topics.get_blog_by_id(topic_id) do
       nil -> false
       topic_changetset ->
         if topic_changetset.user_id == user_id do

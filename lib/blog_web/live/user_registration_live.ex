@@ -1,6 +1,6 @@
 defmodule BlogWeb.UserRegistrationLive do
   use Phoenix.LiveView
-  alias Blog.User
+  alias Blog.Users
   import Argon2
   alias Phoenix.Token
 
@@ -55,7 +55,7 @@ defmodule BlogWeb.UserRegistrationLive do
   def handle_event("save", %{"user_details" => %{"password" => password} = user_details}, socket) do
     encryted_password = hash_pwd_salt(password)
     user_with_encrypted_pass = Map.put(user_details, "password", encryted_password)
-    case User.create_user(user_with_encrypted_pass) do
+    case Users.create_user(user_with_encrypted_pass) do
       {:emailError, _user} ->
         {:noreply, redirect(put_flash(socket, :error, "Email already exsit"), to: "/signup")}
       {:ok, changeset} ->

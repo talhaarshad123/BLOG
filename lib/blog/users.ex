@@ -1,4 +1,4 @@
-defmodule Blog.User do
+defmodule Blog.Users do
   alias Blog.Model.User
   alias Blog.Repo
 

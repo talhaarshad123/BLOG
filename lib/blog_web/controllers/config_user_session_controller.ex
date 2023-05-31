@@ -1,6 +1,7 @@
-defmodule BlogWeb.ConfigUserSession do
+defmodule BlogWeb.ConfigUserSessionController do
   use BlogWeb, :controller
   alias Phoenix.Token
+
 
   def login_user(conn, %{"token" => token}) do
     case Token.verify(BlogWeb.Endpoint, "somekey", token) do
@@ -15,7 +16,14 @@ defmodule BlogWeb.ConfigUserSession do
     conn
     |> configure_session(drop: true)
     |> redirect(to: "/")
-
   end
+
+  def dis_form(conn, params) do
+    IO.inspect("=================")
+    IO.inspect(conn)
+    IO.inspect("=======================")
+    IO.inspect(params)
+  end
+
 
 end

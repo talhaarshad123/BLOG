@@ -1,6 +1,6 @@
 defmodule BlogWeb.Plugs.SetUser do
   import Plug.Conn
-  alias Blog.User
+  alias Blog.Users
   alias Phoenix.Token
 
 
@@ -11,7 +11,7 @@ defmodule BlogWeb.Plugs.SetUser do
     token = get_session(conn, :auth_token)
     case Token.verify(BlogWeb.Endpoint, "somekey", token) do
       {:ok, user_id} ->
-        case User.get_user_by_id(user_id) do
+        case Users.get_user_by_id(user_id) do
           nil ->
             # IO.inspect(assign(conn, :user, nil))
             conn
