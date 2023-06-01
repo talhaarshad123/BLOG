@@ -1,9 +1,9 @@
 defmodule BlogWeb.AddCommentLive do
   use Phoenix.LiveView
   alias Phoenix.Token
-  # alias Blog.Topic
   alias Blog.Comments
   alias Phoenix.PubSub
+  alias Blog.Users
 
   def render(assigns) do
     ~L"""
@@ -15,7 +15,7 @@ defmodule BlogWeb.AddCommentLive do
     <button class="btn" type="submit">Comment</button>
     </form>
     <div>
-    <ul class="collection">
+    <ul class="collection" id="comments-id" phx-hook="Comments">
     <%= for comment <- @blog.comments do %>
       <li class="collection-item"> <%= comment.content %>
 
@@ -63,7 +63,8 @@ defmodule BlogWeb.AddCommentLive do
         case Comments.insert_comment(blog, params, user_id) do
           {:ok, comment} ->
             broadcast_comment(comment)
-            {:noreply, socket}
+            payload = generate_payload(comment)
+            {:noreply, socket |> push_event("update-comments", payload)}
           {:error, _reason} ->
             {:noreply, socket |> put_flash(:error, "Something went wrong") |> redirect(to: "/")}
         end
@@ -73,11 +74,21 @@ defmodule BlogWeb.AddCommentLive do
   end
 
   def handle_info({:comment, comment}, socket) do
-    blog_comments = Comments.get_comments_by_blog(comment.topic_id)
-    {:noreply, assign(socket, blog: blog_comments)}
+    payload = generate_payload(comment)
+    {:noreply, socket |> push_event("update-comments", payload)}
   end
 
   defp broadcast_comment(comment) do
     PubSub.broadcast(Blog.PubSub, "comment:#{comment.topic_id}", {:comment, comment})
+  end
+
+
+  defp generate_payload(comment) do
+    user = Users.get_user_by_id(comment.user_id)
+    %{
+      content: comment.content,
+      id: comment.id,
+      name: user.fname
+    }
   end
 end

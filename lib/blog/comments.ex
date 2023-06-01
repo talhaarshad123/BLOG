@@ -14,6 +14,7 @@ defmodule Blog.Comments do
     |> build_assoc(:comments, user_id: user_id)
     |> Comment.changeset(content)
     |> Repo.insert()
+    # |> Repo.preload(:user)
   end
 
   def get_comment_by_id(comment_id) do

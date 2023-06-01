@@ -33,6 +33,7 @@ defmodule BlogWeb.Router do
       live "/signup", UserRegistrationLive
       live "/login", UserAuthenticationLive
       get "/login/:token", ConfigUserSessionController, :login_user
+      live "/my", TestLive
 
     end
 

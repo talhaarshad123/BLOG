@@ -34,8 +34,8 @@ defmodule BlogWeb.EditCommentLive do
     comment = socket.assigns.comment
     blog_id = socket.assigns.comment.topic_id
     case Comments.update_comment(comment, content) do
-      {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Updated.") |> redirect(to: "auth/blog/#{blog_id}/comment")}
-      {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "auth/edit/#{comment.id}/comment")}
+      {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Updated.") |> redirect(to: "/blog/#{blog_id}/comment")}
+      {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "/auth/edit/#{comment.id}/comment")}
 
     end
   end

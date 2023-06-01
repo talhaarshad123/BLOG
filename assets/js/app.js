@@ -22,8 +22,42 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+
+const Hooks = {}
+Hooks.Comments = {
+    mounted(){
+        this.handleEvent("update-comments", payload => {
+            console.log("update?")
+            console.log(payload)
+            let unOrderList = document.getElementById("comments-id")
+            let newListItem = document.createElement("li")
+            let containerForEditAndDelete = document.createElement("div")
+            let editLink = document.createElement("a")
+            let deleteLink = document.createElement("a")
+            let commentOwnerContainer = document.createElement("div")
+            let text = document.createTextNode(payload.content)
+            commentOwnerContainer.className = "secondary-content"
+            commentOwnerContainer.innerText = payload.name
+            editLink.href = `/auth/edit/${payload.id}/comment`
+            deleteLink.href = `/auth/delete/${payload.id}/comment`
+            editLink.innerText = 'Edit '
+            deleteLink.innerText = 'delete'
+            containerForEditAndDelete.appendChild(editLink)
+            containerForEditAndDelete.appendChild(deleteLink)
+            containerForEditAndDelete.className = "right"
+            newListItem.appendChild(containerForEditAndDelete)
+            newListItem.appendChild(commentOwnerContainer)
+            newListItem.className = "collection-item"
+            newListItem.appendChild(text)
+            unOrderList.appendChild(newListItem)
+
+        })
+    }
+}
+
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
