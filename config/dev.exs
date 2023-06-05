@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :blog, Blog.Repo,
-  username: "",
-  password: "",
-  hostname: "",
-  database: "",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "blog_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
