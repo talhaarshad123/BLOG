@@ -9,18 +9,20 @@ defmodule Blog.UserTest do
 
 
     test "list of all users" do
+      IO.inspect("Running test --list of all users -- ...")
       user = user_fixtures()
-      IO.inspect(user)
       assert [user] == Users.get_all_users()
     end
 
 
     test "get_user/1 returns user with given id" do
+      IO.inspect("Running test -- get_user/1 returns user with given id -- ...")
       user = user_fixtures()
       assert Blog.Users.get_user_by_id(user.id) == user
     end
 
     test "create_user/1 with valid data creates a user" do
+      IO.inspect("Running test -- create_user/1 with valid data creates a user -- ...")
       valid_data = %{
         "fname" => "fname",
         "lname" => "lname",
@@ -35,6 +37,7 @@ defmodule Blog.UserTest do
     end
 
     test "create_user/1 with invalid data return error changeset" do
+      IO.inspect("Running test -- create_user/1 with invalid data return error changeset -- ...")
       invalid_data = %{
         "fname" => nil,
         "lname" => nil,
@@ -45,6 +48,7 @@ defmodule Blog.UserTest do
     end
 
     test "update_user/2 with valid data updates user" do
+      IO.inspect("Running test -- update_user/2 with valid data updates user -- ...")
       user = user_fixtures()
       valid_data = %{"fname" => "some updated fname",
       "lname" => "some updated lname",
@@ -58,6 +62,7 @@ defmodule Blog.UserTest do
     end
 
     test "update_user/2 with invalid data return error changeset" do
+      IO.inspect("Running test -- update_user/2 with invalid data return error changeset -- ...")
       invalid_data = %{"fname" => nil,
       "lname" => nil,
       "email" => nil,
@@ -68,6 +73,7 @@ defmodule Blog.UserTest do
     end
 
     test "delete_user/1 deletes user" do
+      IO.inspect("Running test -- delete_user/1 deletes user -- ...")
       user = user_fixtures()
       assert {:ok, %User{}} = Users.delete_user(user)
       assert nil == Users.get_user_by_id(user.id)

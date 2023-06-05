@@ -112,7 +112,13 @@ defmodule BlogWeb.ListAllBlogsLive do
   end
   def handle_info({:topic, topic}, socket) do
     payload = generate_payload_topic(topic)
-    {:noreply, socket |> push_event("new-topic", payload)}
+    current_page = socket.assigns.page
+    if current_page === 1 do
+      {:noreply, socket |> push_event("new-topic", payload)}
+    else
+      {:noreply, socket}
+    end
+
   end
 
   def handle_info(_msg, socket) do

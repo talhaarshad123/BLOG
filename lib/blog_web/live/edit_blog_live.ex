@@ -42,7 +42,7 @@ defmodule BlogWeb.EditBlogLive do
 
   def handle_event("save", %{"description" => description, "title" => title}, socket) do
     topic = socket.assigns.topic
-    case Topics.update_blog(topic, title, description) do
+    case Topics.update_blog(topic, %{title: title, description: description}) do
       {:ok, _changeset} -> {:noreply, socket |> put_flash(:info, "Blog updated") |> redirect(to: "/")}
       {:error, _changeset} -> {:noreply, socket |> put_flash(:error, "Oops something went wrong"), redirect(to: "/")}
     end

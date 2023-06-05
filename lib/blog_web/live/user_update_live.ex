@@ -61,8 +61,6 @@ defmodule BlogWeb.UserUpdateLive do
   def handle_event("save", %{"user_details" => %{"oldPassword" => password} = user_details}, socket) do
     user = socket.assigns.user
     if is_new_password_set?(user_details) do
-      # m = Map.put(user_details, "newPassword", "1234")
-      # Users.updated_user(user, Map.put(user_details, "newPassword", "1234"))
       case verify_pass(password, user.password) do
         true ->
           encrypted_password = hash_pwd_salt(user_details["newPassword"])
