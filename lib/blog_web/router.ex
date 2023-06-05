@@ -9,6 +9,7 @@ defmodule BlogWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug BlogWeb.Plugs.SetUser
+    # plug BlogWeb.Plugs.NotLoggedIn
   end
 
   pipeline :auth do
@@ -34,6 +35,7 @@ defmodule BlogWeb.Router do
       live "/login", UserAuthenticationLive
       get "/login/:token", ConfigUserSessionController, :login_user
       live "/my", TestLive
+      live "/my/new", TestNewLive
 
     end
 
@@ -45,6 +47,8 @@ defmodule BlogWeb.Router do
       live "/edit/:id/comment", EditCommentLive
       live "/delete/:id/comment", DeleteCommentLive
       live "/myposts", MyPostLive
+      live "/profile", UserUpdateLive
+      live "/delete", UserDeleteLive
 
       get "/signout", ConfigUserSessionController, :logout_user
 

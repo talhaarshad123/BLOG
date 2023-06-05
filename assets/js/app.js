@@ -27,8 +27,8 @@ const Hooks = {}
 Hooks.Comments = {
     mounted(){
         this.handleEvent("update-comments", payload => {
-            console.log("update?")
-            console.log(payload)
+            // console.log("update?")
+            // console.log(payload)
             let unOrderList = document.getElementById("comments-id")
             let newListItem = document.createElement("li")
             let containerForEditAndDelete = document.createElement("div")
@@ -50,10 +50,61 @@ Hooks.Comments = {
             newListItem.className = "collection-item"
             newListItem.appendChild(text)
             unOrderList.appendChild(newListItem)
+            document.getElementById("comment-input").value = ''
 
         })
     }
 }
+
+Hooks.TestTopics = {
+   mounted(){
+    this.handleEvent("test-event", payload => {
+        console.log("Mounted?")
+    })
+   },
+   updated(){
+    console.log("Updated?")
+   }
+}
+
+Hooks.TopicHook = {
+    mounted(){
+        this.handleEvent("new-topic", payload => {
+            // console.log(this.el)
+            let unOrderedList = document.getElementById("topics")
+            let listItem = document.createElement("li")
+            let topicNameAchor = document.createElement("a")
+            let containerForLike = document.createElement("div")
+            let totalLikes = document.createTextNode(0)
+            let manageLikeLink = document.createElement("a")
+            topicNameAchor.href = `/blog/${payload.topic_id}/comment`
+            topicNameAchor.innerText = payload.title
+            manageLikeLink.href = "#"
+            manageLikeLink.setAttribute("phx-click", "manage-like")
+            manageLikeLink.setAttribute("phx-value-id", `${payload.topic_id}`)
+            manageLikeLink.innerText = "like"
+            containerForLike.appendChild(totalLikes)
+            containerForLike.appendChild(manageLikeLink)
+            containerForLike.className = "center"
+            listItem.id = `topic${payload.topic_id}`
+            listItem.className = "collection-item"
+            listItem.appendChild(topicNameAchor)
+            listItem.appendChild(containerForLike)
+            unOrderedList.prepend(listItem)
+        }),
+        this.handleEvent("delete-topic", payload => {
+            let blog_id = payload.blog_id
+            document.getElementById(`topic${blog_id}`).remove()
+            // console.log(blog_id)
+            // console.log(listItem)
+        })
+    },
+    updated(){
+        console.log("Updated?")
+    },
+}
+
+
 
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

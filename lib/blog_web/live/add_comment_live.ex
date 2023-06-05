@@ -11,7 +11,7 @@ defmodule BlogWeb.AddCommentLive do
     <h4> <%= @blog.description %> </h4>
     <form class="form-control" phx-submit="save">
     <div class="input-field">
-    <input class="meterialize-textarea" placeholder="Enter Comment" required name="content">
+    <input class="meterialize-textarea" placeholder="Enter Comment" required name="content" id="comment-input">
     <button class="btn" type="submit">Comment</button>
     </form>
     <div>
@@ -63,8 +63,7 @@ defmodule BlogWeb.AddCommentLive do
         case Comments.insert_comment(blog, params, user_id) do
           {:ok, comment} ->
             broadcast_comment(comment)
-            payload = generate_payload(comment)
-            {:noreply, socket |> push_event("update-comments", payload)}
+            {:noreply, socket}
           {:error, _reason} ->
             {:noreply, socket |> put_flash(:error, "Something went wrong") |> redirect(to: "/")}
         end

@@ -7,7 +7,7 @@ defmodule Blog.Topics do
   alias Blog.Model.Like
 
   def all_topics(page) do
-    limit = 3
+    limit = 2
     query = from t in Topic,
     limit: ^limit,
     offset: (^page - 1) * ^limit,
@@ -21,6 +21,7 @@ defmodule Blog.Topics do
     |> build_assoc(:topics)
     |> Topic.changeset(blog)
     |> Repo.insert()
+    # |> Repo.preload(:likes)
   end
 
   def get_blog_by_id(topic_id) do

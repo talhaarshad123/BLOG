@@ -2,6 +2,7 @@ defmodule BlogWeb.DeleteBlogLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Topics
+  alias Phoenix.PubSub
 
   def render(assigns) do
     ~L"""
@@ -12,7 +13,9 @@ defmodule BlogWeb.DeleteBlogLive do
     {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
     if is_owner?(topic_id, user_id) do
       case Topics.delete_blog(topic_id) do
-        {:ok, _} -> {:ok, socket |> put_flash(:info, "Blog Deleted.") |> redirect(to: "/")}
+        {:ok, changeset} ->
+          PubSub.broadcast_from(Blog.PubSub, self(), "topics", {:blog, changeset})
+           {:ok, socket |> put_flash(:info, "Blog Deleted.") |> redirect(to: "/")}
         {:error, _} -> {:ok, socket |> put_flash(:error, "Oops Something went wrong") |> redirect(to: "/")}
       end
     else

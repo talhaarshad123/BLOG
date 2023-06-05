@@ -2,6 +2,7 @@ defmodule BlogWeb.NewBlogLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Topics
+  alias Phoenix.PubSub
 
   def render(assigns) do
     ~L"""
@@ -40,7 +41,8 @@ defmodule BlogWeb.NewBlogLive do
     user_id = socket.assigns.user_id
     if is_authenticated? do
       case Topics.create_blog(blog_details, user_id) do
-        {:ok, _topic} ->
+        {:ok, topic} ->
+          PubSub.broadcast_from(Blog.PubSub, self(), "topics", {:topic, topic})
           {:noreply, socket |> put_flash(:info, "Blog created.") |> redirect(to: "/")}
         {:error, _reason} ->
           {:noreply, socket |> put_flash(:error, "Oops Something went wrong") |> redirect(to: "/new")}

@@ -19,7 +19,7 @@
       <a href="/" class="brand-logo">Blog</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
         <%= if @conn.assigns[:user] do %>
-            <li><p><%= @conn.assigns.user.fname %> <%= @conn.assigns.user.lname %></p></li>
+            <li><a href="/auth/profile"><%= @conn.assigns.user.fname %> <%= @conn.assigns.user.lname %></a></li>
             <li><a href="/auth/myposts">My Posts</a></li>
             <li><a href="/auth/signout">signout</a></li>
         <% else %>

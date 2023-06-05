@@ -14,7 +14,7 @@ defmodule BlogWeb.DeleteCommentLive do
     blog_id = comment.topic_id
     {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
     if is_owner?(comment, user_id) do
-      case Comments.delete_comment(comment_id) do
+      case Comments.delete_comment(comment) do
         {:ok, _} -> {:ok, socket |> put_flash(:info, "Comment deleted.") |> redirect(to: "/blog/#{blog_id}/comment")}
         {:error, _} -> {:ok, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "/")}
       end

@@ -15,7 +15,7 @@ defmodule BlogWeb.ConfigUserSessionController do
   def logout_user(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: "/")
+    |> redirect(to: "/login")
   end
 
 

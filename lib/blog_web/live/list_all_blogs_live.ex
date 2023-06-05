@@ -9,9 +9,9 @@ defmodule BlogWeb.ListAllBlogsLive do
   def render(assigns) do
     ~L"""
       <h5>Topics</h5>
-      <ul class="collection">
+      <ul class="collection" id="topics" phx-hook="TopicHook">
       <%= for topic <- @topics do %>
-        <li class="collection-item">
+        <li class="collection-item" id="topic<%= topic.id %>">
           <a href="/blog/<%= topic.id %>/comment"><%= topic.title %></a>
           <%= if @authenticated and @user_id == topic.user_id do  %>
             <div class="right">
@@ -55,6 +55,7 @@ defmodule BlogWeb.ListAllBlogsLive do
   def mount(_, %{"auth_token" => auth_token}, socket) do
     topics = Topics.all_topics(1)
     {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
+    PubSub.subscribe(Blog.PubSub, "topics")
     PubSub.subscribe(Blog.PubSub, "likes")
     {:ok, socket |> assign(topics: topics, user_id: user_id, authenticated: true, page: 1)}
   end
@@ -64,6 +65,7 @@ defmodule BlogWeb.ListAllBlogsLive do
     # PubSub.subscribe(Blog.PubSub, "likes")
     {:ok, socket |> assign(topics: topics, user_id: nil, authenticated: false, page: 1)}
   end
+
 
   def handle_event("manage-like", %{"id" => blog_id}, socket) do
     user_id = socket.assigns.user_id
@@ -104,6 +106,15 @@ defmodule BlogWeb.ListAllBlogsLive do
     {:noreply, socket |> assign(topics: topics, page: current_page)}
   end
 
+  def handle_info({:blog, blog}, socket) do
+    payload = %{blog_id: blog.id}
+    {:noreply, socket |> push_event("delete-topic", payload)}
+  end
+  def handle_info({:topic, topic}, socket) do
+    payload = generate_payload_topic(topic)
+    {:noreply, socket |> push_event("new-topic", payload)}
+  end
+
   def handle_info(_msg, socket) do
     topics = Topics.all_topics(1)
     {:noreply, socket |> assign(topics: topics)}
@@ -114,6 +125,25 @@ defmodule BlogWeb.ListAllBlogsLive do
     case Likes.get_like_by_blog_user(blog_id, user_id) do
       nil -> false
       _like -> true
+    end
+  end
+
+  defp generate_payload_topic(topic) do
+    %{
+      topic_id: topic.id,
+      title: topic.title,
+      user_id: topic.user_id
+    }
+  end
+  def is_owner?(topic_id, user_id) do
+    case Topics.get_blog_by_id(topic_id) do
+      nil -> false
+      topic_changetset ->
+        if topic_changetset.user_id == user_id do
+          true
+        else
+          false
+        end
     end
   end
 end

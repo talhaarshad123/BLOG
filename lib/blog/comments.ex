@@ -26,8 +26,8 @@ defmodule Blog.Comments do
     |> Repo.update()
   end
 
-  def delete_comment(comment_id) do
-    Repo.get(Comment, comment_id)
+  def delete_comment(comment) do
+    comment
     |> Repo.delete()
   end
 
