@@ -27,8 +27,6 @@ const Hooks = {}
 Hooks.Comments = {
     mounted(){
         this.handleEvent("update-comments", payload => {
-            // console.log("update?")
-            // console.log(payload)
             let unOrderList = document.getElementById("comments-id")
             let newListItem = document.createElement("li")
             let containerForEditAndDelete = document.createElement("div")
@@ -98,9 +96,6 @@ Hooks.TopicHook = {
             // console.log(blog_id)
             // console.log(listItem)
         })
-    },
-    updated(){
-        console.log("Updated?")
     },
 }
 

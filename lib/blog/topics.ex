@@ -9,7 +9,7 @@ defmodule Blog.Topics do
   def all_topics(page) do
     limit = 2
     query = from t in Topic,
-    limit: ^limit,
+    limit: ^(limit + 1),
     offset: (^page - 1) * ^limit,
     order_by: [desc: t.inserted_at],
     preload: [:likes]

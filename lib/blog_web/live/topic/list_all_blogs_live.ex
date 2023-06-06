@@ -5,6 +5,8 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
   alias Phoenix.Token
   alias Blog.Likes
 
+  @per_page 2
+
 
   def render(assigns) do
     ~L"""
@@ -35,10 +37,7 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
       <%= if @page > 1 do %>
         <a class="waves-effect waves-light btn" phx-click="previous">back</a>
       <% end %>
-        <%= case @topics do %>
-        <% [] -> %>
-          <a class="waves-effect waves-light btn disabled">next</a>
-        <% _ ->  %>
+        <%= if @has_next? do %>
           <a class="waves-effect waves-light btn" phx-click="next">next</a>
         <% end %>
       </div>
@@ -54,16 +53,27 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
 
   def mount(_, %{"auth_token" => auth_token}, socket) do
     topics = Topics.all_topics(1)
+    has_next? = length(topics) > @per_page
     {:ok, user_id} = Token.verify(BlogWeb.Endpoint, "somekey", auth_token)
     PubSub.subscribe(Blog.PubSub, "topics")
     PubSub.subscribe(Blog.PubSub, "likes")
-    {:ok, socket |> assign(topics: topics, user_id: user_id, authenticated: true, page: 1)}
+    cond do
+      has_next? ->
+        {:ok, socket |> assign(topics: Enum.slice(topics, 0, @per_page), user_id: user_id, authenticated: true, page: 1, has_next?: has_next?)}
+      true -> {:ok, socket |> assign(topics: topics, user_id: user_id, authenticated: true, page: 1, has_next?: has_next?)}
+    end
   end
 
   def mount(_, _, socket) do
-    topics = Topics.all_topics(1)
     # PubSub.subscribe(Blog.PubSub, "likes")
-    {:ok, socket |> assign(topics: topics, user_id: nil, authenticated: false, page: 1)}
+    topics = Topics.all_topics(1)
+    has_next? = length(topics) > @per_page
+    cond do
+      has_next? ->
+        {:ok, socket |> assign(topics: Enum.slice(topics, 0, @per_page), user_id: nil, authenticated: false, page: 1, has_next?: has_next?)}
+      true -> {:ok, socket |> assign(topics: topics, user_id: nil, authenticated: false, page: 1, has_next?: has_next?)}
+    end
+
   end
 
 
@@ -97,13 +107,25 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
     current_page = socket.assigns.page
     current_page = current_page - 1
     topics = Topics.all_topics(current_page)
-    {:noreply, socket |> assign(topics: topics, page: current_page)}
+    has_next? = length(topics) > @per_page
+    cond do
+      has_next? ->
+        {:noreply, socket |> assign(topics: Enum.slice(topics, 0, @per_page), page: current_page, has_next?: has_next?)}
+      true ->
+        {:noreply, socket |> assign(topics: topics, page: current_page, has_next?: has_next?)}
+    end
   end
   def handle_event("next", _unsigned_params, socket) do
     current_page = socket.assigns.page
     current_page = current_page + 1
     topics = Topics.all_topics(current_page)
-    {:noreply, socket |> assign(topics: topics, page: current_page)}
+    has_next? = length(topics) > @per_page
+    cond do
+      has_next? ->
+        {:noreply, socket |> assign(topics: Enum.slice(topics, 0, @per_page), page: current_page, has_next?: has_next?)}
+      true ->
+        {:noreply, socket |> assign(topics: topics, page: current_page, has_next?: has_next?)}
+    end
   end
 
   def handle_info({:blog, blog}, socket) do
