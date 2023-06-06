@@ -22,8 +22,10 @@ defmodule Blog.Comments do
   end
 
   def update_comment(current_comment, content) do
-    Ecto.Changeset.change(current_comment, content: content)
+    current_comment
+    |> Comment.changeset(content)
     |> Repo.update()
+    # Ecto.Changeset.change(current_comment, content: content)
   end
 
   def delete_comment(comment) do

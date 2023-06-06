@@ -9,7 +9,7 @@ defmodule Blog.UserTest do
 
 
     test "list of all users" do
-      IO.inspect("Running test --list of all users -- ...")
+      IO.inspect("Running test -- list of all users -- ...")
       user = user_fixtures()
       assert [user] == Users.get_all_users()
     end

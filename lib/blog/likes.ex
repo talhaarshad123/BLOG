@@ -15,8 +15,8 @@ defmodule Blog.Likes do
     Repo.get_by(Like, topic_id: blog_id, user_id: user_id)
   end
 
-  def delete_like(like_id) do
-    Repo.get(Like, like_id)
+  def delete_like(like) do
+    like
     |> Repo.delete()
   end
 

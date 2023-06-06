@@ -81,7 +81,7 @@ defmodule BlogWeb.ListAllBlogsLive do
         end
       else
         like = Likes.get_like_by_blog_user(blog_id, user_id)
-        case Likes.delete_like(like.id) do
+        case Likes.delete_like(like) do
           {:ok, _} ->
             PubSub.broadcast(Blog.PubSub, "likes", {})
             {:noreply, socket}
