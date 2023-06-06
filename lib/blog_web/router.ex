@@ -29,10 +29,10 @@ defmodule BlogWeb.Router do
 
   scope "/", BlogWeb do
     pipe_through :browser
-      live "/", ListAllBlogsLive
-      live "/blog/:blog_id/comment", AddCommentLive
-      live "/signup", UserRegistrationLive
-      live "/login", UserAuthenticationLive
+      live "/", BlogWeb.Topic.ListAllBlogsLive
+      live "/blog/:blog_id/comment", BlogWeb.Comment.AddCommentLive
+      live "/signup", BlogWeb.User.UserRegistrationLive
+      live "/login", BlogWeb.User.UserAuthenticationLive
       get "/login/:token", ConfigUserSessionController, :login_user
       live "/my", TestLive
       live "/my/new", TestNewLive
@@ -41,14 +41,14 @@ defmodule BlogWeb.Router do
 
   scope "/auth", BlogWeb do
     pipe_through :auth
-      live "/new", NewBlogLive
-      live "/edit/:edit", EditBlogLive
-      live "/delete/:blog_id", DeleteBlogLive
-      live "/edit/:id/comment", EditCommentLive
-      live "/delete/:id/comment", DeleteCommentLive
-      live "/myposts", MyPostLive
-      live "/profile", UserUpdateLive
-      live "/delete", UserDeleteLive
+      live "/new", BlogWeb.Topic.NewBlogLive
+      live "/edit/:edit", BlogWeb.Topic.EditBlogLive
+      live "/delete/:blog_id", BlogWeb.Topic.DeleteBlogLive
+      live "/edit/:id/comment", BlogWeb.Comment.EditCommentLive
+      live "/delete/:id/comment", BlogWeb.Comment.DeleteCommentLive
+      live "/myposts", BlogWeb.Topic.MyPostLive
+      live "/profile", BlogWeb.User.UserUpdateLive
+      live "/delete", BlogWeb.User.UserDeleteLive
 
       get "/signout", ConfigUserSessionController, :logout_user
 

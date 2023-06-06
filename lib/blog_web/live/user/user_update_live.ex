@@ -1,4 +1,4 @@
-defmodule BlogWeb.UserUpdateLive do
+defmodule BlogWeb.User.UserUpdateLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Users

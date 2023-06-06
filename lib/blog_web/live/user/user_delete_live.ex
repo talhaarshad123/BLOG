@@ -1,4 +1,4 @@
-defmodule BlogWeb.UserDeleteLive do
+defmodule BlogWeb.User.UserDeleteLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Users

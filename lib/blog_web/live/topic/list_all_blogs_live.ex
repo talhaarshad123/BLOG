@@ -1,4 +1,4 @@
-defmodule BlogWeb.ListAllBlogsLive do
+defmodule BlogWeb.Topic.ListAllBlogsLive do
   use Phoenix.LiveView
   alias Phoenix.PubSub
   alias Blog.Topics

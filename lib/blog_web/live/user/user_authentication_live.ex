@@ -1,4 +1,4 @@
-defmodule BlogWeb.UserAuthenticationLive do
+defmodule BlogWeb.User.UserAuthenticationLive do
   use Phoenix.LiveView
   alias Blog.Users
   import Argon2

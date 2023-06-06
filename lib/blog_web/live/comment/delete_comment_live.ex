@@ -1,4 +1,4 @@
-defmodule BlogWeb.DeleteCommentLive do
+defmodule BlogWeb.Comment.DeleteCommentLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Comments

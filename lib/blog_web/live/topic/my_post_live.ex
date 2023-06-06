@@ -1,4 +1,4 @@
-defmodule BlogWeb.MyPostLive do
+defmodule BlogWeb.Topic.MyPostLive do
   use Phoenix.LiveView
   alias Phoenix.Token
   alias Blog.Topics
