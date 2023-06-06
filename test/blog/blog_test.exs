@@ -19,8 +19,8 @@ defmodule Blog.BlogTest do
       valid_values = %{title: "some title!", description: "some descrip!"}
 
       assert {:ok, %Topic{} = blog} = Topics.create_blog(valid_values, user.id)
-      assert blog.title == "some title!"
-      assert blog.description == "some descrip!"
+      assert blog.title == valid_values.title
+      assert blog.description == valid_values.description
       assert blog.user_id == user.id
     end
 
@@ -28,7 +28,7 @@ defmodule Blog.BlogTest do
       IO.inspect("Running test -- create_blog/2  with invalid values -- ...")
       user = UserFixture.user_fixtures()
       invalid_values = %{title: nil, description: nil}
-      {:error, %Ecto.Changeset{}} = Topics.create_blog(invalid_values, user.id)
+      assert {:error, %Ecto.Changeset{}} = Topics.create_blog(invalid_values, user.id)
     end
 
     test "list all topics with page number" do
@@ -62,8 +62,8 @@ defmodule Blog.BlogTest do
       }
 
       assert {:ok, %Topic{} = updated_blog} = Topics.update_blog(blog, valid_data)
-      assert updated_blog.title == "some updated title"
-      assert updated_blog.description == "some updated description"
+      assert updated_blog.title == valid_data.title
+      assert updated_blog.description == valid_data.description
     end
 
     test "update_blog/2 with invalid values returns error" do

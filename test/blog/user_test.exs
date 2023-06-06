@@ -30,10 +30,10 @@ defmodule Blog.UserTest do
         "password" => "password"
       }
       assert {:ok, %User{} = user} = Users.create_user(valid_data)
-      assert user.fname == "fname"
-      assert user.lname == "lname"
-      assert user.email == "email@email"
-      assert user.password == "password"
+      assert user.fname == valid_data["fname"]
+      assert user.lname == valid_data["lname"]
+      assert user.email == valid_data["email"]
+      assert user.password == valid_data["password"]
     end
 
     test "create_user/1 with invalid data return error changeset" do
@@ -50,15 +50,15 @@ defmodule Blog.UserTest do
     test "update_user/2 with valid data updates user" do
       IO.inspect("Running test -- update_user/2 with valid data updates user -- ...")
       user = user_fixtures()
-      valid_data = %{"fname" => "some updated fname",
-      "lname" => "some updated lname",
-      "email" => "some updated email",
-      "password" => "some updated password"}
+      valid_data = %{fname: "some updated fname",
+      lname: "some updated lname",
+      email: "some updated email",
+      password: "some updated password"}
       assert {:ok, %User{} = updated_user} = Users.updated_user(user, valid_data)
-      assert updated_user.fname == "some updated fname"
-      assert updated_user.lname == "some updated lname"
-      assert updated_user.email == "some updated email"
-      assert updated_user.password == "some updated password"
+      assert updated_user.fname == valid_data.fname
+      assert updated_user.lname == valid_data.lname
+      assert updated_user.email == valid_data.email
+      assert updated_user.password == valid_data.password
     end
 
     test "update_user/2 with invalid data return error changeset" do

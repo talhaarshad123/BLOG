@@ -26,7 +26,7 @@ defmodule Blog.CommentTest do
       blog = BlogFixture.blog_fixture(user)
       valid_data = %{content: "some comment content"}
       assert {:ok, %Blog.Model.Comment{} = comment} = Comments.insert_comment(blog, valid_data, user.id)
-      assert comment.content == "some comment content"
+      assert comment.content == valid_data.content
     end
 
     test "insert_comment/3 with invalid comment_content returns error changeset" do
@@ -60,7 +60,7 @@ defmodule Blog.CommentTest do
       valid_data = %{content: "some updated comment content"}
 
       assert {:ok, %Blog.Model.Comment{} = updated_comment} = Comments.update_comment(comment, valid_data)
-      assert updated_comment.content == "some updated comment content"
+      assert updated_comment.content == valid_data.content
 
     end
 
