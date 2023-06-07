@@ -3,6 +3,7 @@ defmodule BlogWeb.User.UserRegistrationLive do
   alias Blog.Users
   import Argon2
   alias Phoenix.Token
+  import BlogWeb.FormatError
 
   def render(assigns) do
     ~L"""
@@ -56,14 +57,13 @@ defmodule BlogWeb.User.UserRegistrationLive do
     encryted_password = hash_pwd_salt(password)
     user_with_encrypted_pass = Map.put(user_details, "password", encryted_password)
     case Users.create_user(user_with_encrypted_pass) do
-      {:emailError, _user} ->
-        {:noreply, redirect(put_flash(socket, :error, "Email already exsit"), to: "/signup")}
       {:ok, changeset} ->
         user_token = Token.sign(BlogWeb.Endpoint, "somekey", changeset.id)
         {:noreply, socket |>
         put_flash(:info, "User is created.") |> redirect(to: "/login/#{user_token}")}
-      {:error, _reason} ->
-        {:noreply, redirect(put_flash(socket, :error, "Oops! something went wrong."), to: "/signup")}
+      {:error, changeset} ->
+        [reason|_] = format_error_changeset(changeset)
+        {:noreply, redirect(put_flash(socket, :error, "#{reason}"), to: "/signup")}
     end
     # {:noreply, assign(socket, user: user)}
   end

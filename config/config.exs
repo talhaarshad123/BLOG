@@ -60,6 +60,10 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :blog, AuthMe.UserManager.Guardian,
+  issuer: "blog",
+  secret_key: "rZWAbY5aJwPWZKBDqiLxa7dXL3iUkkw+9KsLrfQGlI5ehw8ljk0eJaQfa93MR8Q8"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

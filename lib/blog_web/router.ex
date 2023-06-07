@@ -27,6 +27,10 @@ defmodule BlogWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth_api do
+    plug BlogWeb.Plugs.AuthenticatedApi
+  end
+
   scope "/", BlogWeb do
     pipe_through :browser
       live "/", Topic.ListAllBlogsLive
@@ -57,10 +61,30 @@ defmodule BlogWeb.Router do
     # get "/", PageController, :home
 
   # Other scopes may use custom stacks.
-  # scope "/api", BlogWeb do
-  #   pipe_through :api
+  scope "/api", BlogWeb do
+    pipe_through :api
 
-  # end
+    get "/blogs/:page", BlogController, :index
+    get "/blog/:id", BlogController, :show
+    get "/blog/:id/comments", BlogController, :blog_comments
+
+    post "/accounts/create", UserController, :create
+    post "/accounts/login", UserController, :login
+
+  end
+
+  scope "/api/:token", BlogWeb do
+    pipe_through [:api, :auth_api]
+
+    patch "/accounts/edit", UserController, :edit
+    delete "/accounts/delete", UserController, :delete
+    post "/blog/new", BlogController, :create
+    patch "/blog/edit/:id", BlogController, :edit
+    delete "/blog/delete/:id", BlogController, :delete
+
+
+    post "/blog/:blog_id/comment/new", CommentController, :create
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:blog, :dev_routes) do
