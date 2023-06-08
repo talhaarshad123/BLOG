@@ -7,7 +7,7 @@ defmodule Blog.Topics do
   # alias Blog.Model.Like
 
   def all_topics(page) do
-    limit = 2
+    limit = 5
     query = from t in Topic,
     limit: ^(limit + 1),
     offset: (^page - 1) * ^limit,

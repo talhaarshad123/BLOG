@@ -4,8 +4,9 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
   alias Blog.Topics
   alias Phoenix.Token
   alias Blog.Likes
+  import BlogWeb.FormatError
 
-  @per_page 2
+  @per_page 5
 
 
   def render(assigns) do
@@ -95,7 +96,7 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
           {:ok, _} ->
             PubSub.broadcast(Blog.PubSub, "likes", {})
             {:noreply, socket}
-          {:error, _} -> {:noreply, socket |> put_flash(:error, "Something went wrong") |> redirect(to: "/")}
+          {:error, changeset} -> {:noreply, socket |> put_flash(:error, "#{format_error_changeset(changeset)}") |> redirect(to: "/")}
         end
       end
     else
@@ -143,9 +144,10 @@ defmodule BlogWeb.Topic.ListAllBlogsLive do
 
   end
 
-  def handle_info(_msg, socket) do
-    topics = Topics.all_topics(1)
-    {:noreply, socket |> assign(topics: topics)}
+  def handle_info({}, socket) do
+    current_page = socket.assigns.page
+    topics = Topics.all_topics(current_page)
+    {:noreply, socket |> assign(topics: Enum.slice(topics, 0, @per_page))}
   end
 
 

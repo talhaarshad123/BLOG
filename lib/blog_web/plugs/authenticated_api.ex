@@ -26,6 +26,7 @@ defmodule BlogWeb.Plugs.AuthenticatedApi do
       {:error, _} ->
         conn
         |> resp(403, "Forbidan")
+        |> halt()
     end
   end
 

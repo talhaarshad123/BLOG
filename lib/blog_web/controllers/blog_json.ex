@@ -1,22 +1,22 @@
 defmodule BlogWeb.BlogJSON do
 
-  def index(%{blogs: blogs}) do
-    %{data: (for blog <- blogs, do: show(blog))}
-  end
-
   def show(%{blog_comments: blog_comments}) do
     %{
       id: blog_comments.id,
       title: blog_comments.title,
-      comments: (for comment <- blog_comments.comments, do: %{id: comment.id, title: comment.content})
+      comments: Enum.map(blog_comments.comments, fn comment -> %{id: comment.id, title: comment.content} end)
     }
   end
 
   def show(%{blogs: blogs}) do
-   %{data: (for blog <- blogs, do: show(blog))}
+   %{data: Enum.map(blogs, fn blog -> data(blog) end)}
   end
 
-  def show(blog) do
+  def show(%{blog: blog}) do
+    data(blog)
+  end
+
+  defp data(blog) do
     %{
       id: blog.id,
       title: blog.title,

@@ -1,8 +1,9 @@
 defmodule BlogWeb.UserController do
   use BlogWeb, :controller
   alias Blog.Users
-  import BlogWeb.FormatError
   alias Phoenix.Token
+
+  action_fallback BlogWeb.FallbackController
 
 
   def create(conn, %{"user" => user_details}) do
@@ -11,49 +12,42 @@ defmodule BlogWeb.UserController do
     else
       encrpted_password = Argon2.hash_pwd_salt(user_details["password"])
       user_details = Map.put user_details, "password", encrpted_password
-      case Users.create_user(user_details) do
-        {:ok, newUser} -> render(conn, :user_response, user: newUser, msg: "User created")
-        {:error, changeset} ->
-          render(conn, :error_handler, error: format_error_changeset(changeset))
+      with {:ok, newUser} <- Users.create_user(user_details) do
+        IO.inspect(newUser)
+        render(conn, :user_response, user: newUser, msg: "User created")
       end
     end
   end
 
   def login(conn, %{"user" => %{"email" => useremail, "password" => plain_password} }) do
-    case Users.get_user_by_email(useremail) do
-      nil -> render(conn, :error_handler, error: "invalid email or password")
-      user ->
-        case Argon2.verify_pass(plain_password, user.password) do
-          true ->
-            token = Token.sign(BlogWeb.Endpoint, "somekey", user.id)
-            render(conn, :user_response, token: token, user: user, msg: "Token created")
-          _ -> render(conn, :error_handler, error: "invalid email or password")
-        end
+    with %Blog.Model.User{} = user <- Users.get_user_by_email(useremail),
+    true <- Argon2.verify_pass(plain_password, user.password)
+     do
+      token = Token.sign(BlogWeb.Endpoint, "somekey", user.id)
+      render(conn, :user_response, token: token, user: user, msg: "Token created")
     end
   end
 
   def edit(conn, %{"user" => user_details}) do
     current_user = conn.assigns.user
-    if user_details["password"] != nil do
+    if user_details["password"] != nil and !password_field_empty?(user_details["password"]) do
       encrypted_password = Argon2.hash_pwd_salt(user_details["password"])
       user_details = Map.put user_details, "password", encrypted_password
-      case Users.updated_user(current_user, user_details) do
-        {:ok, updated_user} -> render(conn, :user_response, user: updated_user, msg: "Edited")
-        {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
+      with {:ok, updated_user} <- Users.updated_user(current_user, user_details) do
+        render(conn, :user_response, user: updated_user, msg: "Edited")
       end
     else
-      case Users.updated_user(current_user, user_details) do
-        {:ok, updated_user} -> render(conn, :user_response, user: updated_user, msg: "Edited")
-        {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
+      with {:ok, updated_user} <- Users.updated_user(current_user, user_details) do
+        render(conn, :user_response, user: updated_user, msg: "Edited")
       end
     end
   end
 
   def delete(conn, _params) do
     user = conn.assigns.user
-    case Users.delete_user(user) do
-      {:ok, deleted_user} -> render(conn, :user_response, user: deleted_user, msg: "Deleted")
-      {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
+    with {:ok, deleted_user} <- Users.delete_user(user)
+    do
+      render(conn, :user_response, user: deleted_user, msg: "Deleted")
     end
   end
 

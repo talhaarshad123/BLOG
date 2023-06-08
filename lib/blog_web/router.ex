@@ -78,12 +78,13 @@ defmodule BlogWeb.Router do
 
     patch "/accounts/edit", UserController, :edit
     delete "/accounts/delete", UserController, :delete
+
     post "/blog/new", BlogController, :create
     patch "/blog/edit/:id", BlogController, :edit
     delete "/blog/delete/:id", BlogController, :delete
 
 
-    post "/blog/:blog_id/comment/new", CommentController, :create
+    post "/blog/comment/:blog_id/new", CommentController, :create
     patch "/blog/comment/:comment_id/edit", CommentController, :edit
     delete "/blog/comment/:comment_id/delete", CommentController, :delete
 

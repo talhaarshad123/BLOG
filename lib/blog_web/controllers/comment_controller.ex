@@ -3,39 +3,32 @@ defmodule BlogWeb.CommentController do
 
   alias Blog.Topics
   alias Blog.Comments
-  import BlogWeb.FormatError
+  # import BlogWeb.FormatError
+  action_fallback BlogWeb.FallbackController
   plug :is_owner when action in [:edit, :delete]
 
   def create(conn, %{"blog_id" => blog_id, "comment" => comment}) do
-    is_authenticated? = conn.assigns.is_authenticated?
-    if is_authenticated? do
-      blog_id = String.to_integer(blog_id)
-      user = conn.assigns.user
-      case Topics.get_blog_by_id(blog_id) do
-        nil -> render(conn, :error_handler, error: "Not Found")
-        blog ->
-          case  Comments.insert_comment(blog, comment, user.id) do
-            {:ok, comment} -> render(conn, :new, comment: comment, blog: blog)
-            {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
-          end
-      end
+    user = conn.assigns.user
+    with {id, _} <- Integer.parse(blog_id),
+    %Blog.Model.Topic{} = blog <- Topics.get_blog_by_id(id),
+    {:ok, inserter_comment} <- Comments.insert_comment(blog, comment, user.id)
+    do
+      render(conn, :show, comment: inserter_comment, blog: blog)
     end
   end
 
 
   def edit(conn, %{"comment" => comment_details}) do
     current_comment = conn.assigns.comment
-    case Comments.update_comment(current_comment, comment_details) do
-      {:ok, updated_comment} -> render(conn, :show, comment: updated_comment)
-      {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
+    with {:ok, updated_comment} <- Comments.update_comment(current_comment, comment_details) do
+      render(conn, :show, comment: updated_comment)
     end
   end
 
   def delete(conn, _params) do
     comment = conn.assigns.comment
-    case Comments.delete_comment(comment) do
-      {:ok, deleted_comment} -> render(conn, :show, comment: deleted_comment)
-      {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
+    with {:ok, deleted_comment} <- Comments.delete_comment(comment) do
+      render(conn, :show, comment: deleted_comment)
     end
   end
 
@@ -54,7 +47,8 @@ defmodule BlogWeb.CommentController do
             conn
             |> assign(:comment, comment)
 
-          conn
+
+            conn
         else
           conn
           |> resp(403, "Forbidan")
