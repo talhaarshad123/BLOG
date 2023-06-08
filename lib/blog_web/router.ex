@@ -64,12 +64,12 @@ defmodule BlogWeb.Router do
   scope "/api", BlogWeb do
     pipe_through :api
 
+    post "/accounts/create", UserController, :create
+    post "/accounts/login", UserController, :login
+
     get "/blogs/:page", BlogController, :index
     get "/blog/:id", BlogController, :show
     get "/blog/:id/comments", BlogController, :blog_comments
-
-    post "/accounts/create", UserController, :create
-    post "/accounts/login", UserController, :login
 
   end
 
@@ -84,6 +84,12 @@ defmodule BlogWeb.Router do
 
 
     post "/blog/:blog_id/comment/new", CommentController, :create
+    patch "/blog/comment/:comment_id/edit", CommentController, :edit
+    delete "/blog/comment/:comment_id/delete", CommentController, :delete
+
+    post "/blog/like/:blog_id", LikeController, :like
+    delete "/blog/unlike/:blog_id", LikeController, :unlike
+
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

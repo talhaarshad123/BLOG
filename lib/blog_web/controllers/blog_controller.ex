@@ -15,7 +15,7 @@ defmodule BlogWeb.BlogController do
     blogs = Topics.all_topics(page_number)
     cond do
       length(blogs) > @per_page -> render(conn, :index, blogs: Enum.slice(blogs, 0, @per_page))
-      true -> render(conn, :index, blogs: blogs)
+      true -> render(conn, :show, blogs: blogs)
     end
 
   end
@@ -33,14 +33,14 @@ defmodule BlogWeb.BlogController do
     case Comments.get_comments_by_blog(blog_id) do
       nil -> render(conn, :error_handler, error: "bad request")
       blog_comments ->
-        render(conn, :blogComments, blog_comments: blog_comments)
+        render(conn, :show, blog_comments: blog_comments)
     end
   end
 
   def create(conn, %{"blog" => blog_details}) do
     user = conn.assigns.user
     case Topics.create_blog(blog_details, user.id) do
-      {:ok, blog} -> render(conn, :create, blog: blog)
+      {:ok, blog} -> render(conn, :show, blog: blog)
       {:error, changeset} ->
         render(conn, :error_handler, error: format_error_changeset(changeset))
     end
@@ -49,7 +49,7 @@ defmodule BlogWeb.BlogController do
   def edit(conn, %{"blog" => blog_details}) do
     blog = conn.assigns.blog
     case Topics.update_blog(blog, blog_details) do
-      {:ok, updated_blog} -> render(conn, :edit, updated_blog: updated_blog)
+      {:ok, updated_blog} -> render(conn, :show, blog: updated_blog)
       {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
     end
   end
@@ -57,7 +57,7 @@ defmodule BlogWeb.BlogController do
   def delete(conn, _params) do
     blog = conn.assigns.blog
     case Topics.delete_blog(blog.id) do
-      {:ok, deleted_blog} -> render(conn, :delete, deleted_blog: deleted_blog)
+      {:ok, deleted_blog} -> render(conn, :show, blog: deleted_blog)
       {:error, changeset} -> render(conn, :error_handler, error: format_error_changeset(changeset))
     end
   end
@@ -71,7 +71,7 @@ defmodule BlogWeb.BlogController do
     case Topics.get_blog_by_id(blog_id) do
       nil ->
         conn
-        |> resp(403, "Not Found")
+        |> resp(404, "Not Found")
         |> halt()
       blog ->
         cond do
